@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Suggest Classroom Activity</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Segoe UI", sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      background: black; /* ✅ SINGLE COLOR BACKGROUND */
+      overflow-x: hidden;
+      color: #ffffff;
+      position: relative;
+    }
+
+    /* PARTICLES */
+    .particle {
+      position: absolute;
+      color: rgba(255,255,255,0.35);
+      font-size: 14px;
+      animation: float 12s linear infinite;
+    }
+
+    @keyframes float {
+      0% {
+        transform: translateY(100vh);
+        opacity: 0;
+      }
+      10% { opacity: 1; }
+      100% {
+        transform: translateY(-10vh);
+        opacity: 0;
+      }
+    }
+
+    .container {
+      max-width: 900px;
+      margin: auto;
+      padding: 40px 20px;
+      position: relative;
+      z-index: 2;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      text-align: center;
+      opacity: 0.8;
+      margin-bottom: 30px;
+    }
+
+    /* CARD */
+    .card {
+      background: rgba(255,255,255,0.08);
+      backdrop-filter: blur(12px);
+      border-radius: 16px;
+      padding: 25px;
+      margin-bottom: 25px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+    }
+
+    .card h2 {
+      margin-bottom: 15px;
+      font-size: 20px;
+    }
+
+    /* FORM */
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+    }
+
+    label {
+      font-size: 14px;
+      opacity: 0.85;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 10px;
+      border-radius: 8px;
+      border: none;
+      outline: none;
+      margin-top: 6px;
+    }
+
+    .btn {
+      margin-top: 20px;
+      width: 100%;
+      padding: 14px;
+      border-radius: 30px;
+      border: none;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      background: #f59e0b; /* orange button */
+      color: #000;
+      transition: transform 0.2s ease;
+    }
+
+    .btn:hover {
+      transform: scale(1.03);
+    }
+
+    .output-section {
+      display: none;
+      animation: fadeIn 0.8s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .output-block {
+      margin-bottom: 15px;
+    }
+
+    .output-block h3 {
+      font-size: 16px;
+      margin-bottom: 5px;
+      color: #facc15;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 15px;
+    }
+
+    .action-btn {
+      padding: 10px 16px;
+      border-radius: 20px;
+      border: none;
+      cursor: pointer;
+      font-size: 14px;
+      background: rgba(255,255,255,0.15);
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+
+<script>
+  for (let i = 0; i < 40; i++) {
+    const p = document.createElement("div");
+    p.className = "particle";
+    p.innerText = "*";
+    p.style.left = Math.random() * 100 + "vw";
+    p.style.animationDuration = 8 + Math.random() * 8 + "s";
+    p.style.fontSize = 10 + Math.random() * 10 + "px";
+    document.body.appendChild(p);
+  }
+</script>
+
+<div class="container">
+  <h1>Suggest Classroom Activity</h1>
+  <p class="subtitle">Instant engagement ideas for your classroom</p>
+
+  <div class="card">
+    <h2>Activity Inputs</h2>
+    <div class="form-grid">
+      <div>
+        <label>Subject</label>
+        <input id="subject" placeholder="Math / Science" />
+      </div>
+      <div>
+        <label>Class / Grade</label>
+        <input id="grade" placeholder="Class 6" />
+      </div>
+      <div>
+        <label>Topic</label>
+        <input id="topic" placeholder="Fractions" />
+      </div>
+      <div>
+        <label>Available Time</label>
+        <select id="time">
+          <option>5 minutes</option>
+          <option>10 minutes</option>
+          <option>15 minutes</option>
+        </select>
+      </div>
+    </div>
+
+    <button class="btn" onclick="generateActivity()">Suggest Activity</button>
+  </div>
+
+  <div class="card output-section" id="output">
+    <h2>Suggested Activity</h2>
+
+    <div class="output-block">
+      <h3>Activity Title</h3>
+      <p id="outTitle"></p>
+    </div>
+
+    <div class="output-block">
+      <h3>Overview</h3>
+      <p id="outOverview"></p>
+    </div>
+
+    <div class="output-block">
+      <h3>Steps</h3>
+      <ol id="outSteps"></ol>
+    </div>
+
+    <div class="output-block">
+      <h3>Time Breakdown</h3>
+      <p id="outTime"></p>
+    </div>
+
+    <div class="actions">
+      <button class="action-btn" onclick="generateActivity()">🔄 Another</button>
+      <button class="action-btn">⭐ Save</button>
+      <button class="action-btn">📤 Share</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  function generateActivity() {
+    const subject = document.getElementById("subject").value || "the subject";
+    const topic = document.getElementById("topic").value || "this concept";
+    const time = document.getElementById("time").value;
+
+    document.getElementById("outTitle").innerText =
+      "Think–Pair–Share Activity";
+
+    document.getElementById("outOverview").innerText =
+      `A short peer-based activity to help students understand ${topic} in ${subject}.`;
+
+    const steps = [
+      "Divide students into pairs",
+      "Give one question related to the topic",
+      "Allow discussion time",
+      "Ask one pair to share the answer"
+    ];
+
+    const list = document.getElementById("outSteps");
+    list.innerHTML = "";
+    steps.forEach(step => {
+      const li = document.createElement("li");
+      li.innerText = step;
+      list.appendChild(li);
+    });
+
+    document.getElementById("outTime").innerText =
+      `Total time: ${time} (Setup + Activity + Discussion)`;
+
+    document.getElementById("output").style.display = "block";
+  }
+</script>
+
+</body>
+</html>

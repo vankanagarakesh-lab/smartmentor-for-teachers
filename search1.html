@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>AI Teaching Plan</title>
+
+<style>
+:root{
+  --bg-color:#f4f6f8;
+  --text-color:#1f2933;
+  --border-color:#d1d5db;
+  --accent:#2563eb;
+}
+
+body.dark{
+  --bg-color:#0f172a;
+  --text-color:#e5e7eb;
+  --border-color:#334155;
+  --accent:#38bdf8;
+}
+
+body{
+  margin:0;
+  font-family:'Segoe UI',sans-serif;
+  background:var(--bg-color);
+  color:var(--text-color);
+  min-height:100vh;
+  overflow-x:hidden;
+  transition:0.3s;
+}
+
+/* ☰ Menu Button */
+.menu-btn{
+  position:fixed;
+  top:18px;
+  left:18px;
+  font-size:26px;
+  cursor:pointer;
+  z-index:1001;
+}
+
+/* 🌗 Theme Button */
+.theme-btn{
+  position:fixed;
+  top:18px;
+  right:18px;
+  padding:8px 14px;
+  border-radius:20px;
+  border:none;
+  cursor:pointer;
+  font-weight:bold;
+  background:var(--accent);
+  color:white;
+  z-index:1001;
+}
+
+/* Side Panel (SAME COLOR AS PAGE) */
+.side-panel{
+  position:fixed;
+  top:0;
+  left:-280px;
+  width:280px;
+  height:100%;
+  background:var(--bg-color);
+  padding:20px;
+  border-right:1px solid var(--border-color);
+  transition:0.3s;
+  z-index:1000;
+}
+.side-panel.open{left:0;}
+
+.menu-actions{
+  margin-top:40px;
+  margin-bottom:15px;
+}
+
+.menu-btn-item{
+  width:100%;
+  padding:10px;
+  margin-bottom:10px;
+  background:transparent;
+  border:1px solid var(--border-color);
+  border-radius:8px;
+  cursor:pointer;
+  font-weight:bold;
+  text-align:left;
+  color:var(--text-color);
+}
+
+/* History */
+.history-item{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:10px;
+  margin:8px 0;
+  border:1px solid var(--border-color);
+  border-radius:8px;
+}
+.history-item span{cursor:pointer;}
+.delete-btn{
+  background:none;
+  border:none;
+  cursor:pointer;
+  color:var(--text-color);
+}
+
+/* Main Content */
+.container{
+  padding:80px 30px 120px;
+  max-width:900px;
+  margin:auto;
+}
+
+.box{
+  border:1px solid var(--border-color);
+  border-radius:16px;
+  padding:30px;
+}
+
+/* Highlight */
+.highlight{
+  background:rgba(255,230,0,0.45);
+  padding:4px;
+  border-radius:4px;
+}
+
+/* 🔍 Bottom Search */
+.search-bottom{
+  position:fixed;
+  bottom:20px;
+  left:50%;
+  transform:translateX(-50%);
+  width:100%;
+  max-width:700px;
+  padding:0 15px;
+  z-index:1002;
+}
+
+.search-box{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  border:1px solid var(--border-color);
+  border-radius:30px;
+  padding:10px;
+  background:var(--bg-color);
+}
+
+.search-box input{
+  flex:1;
+  padding:14px 18px;
+  border-radius:30px;
+  border:none;
+  outline:none;
+  font-size:16px;
+  background:transparent;
+  color:var(--text-color);
+}
+
+.mic-btn{
+  width:46px;
+  height:46px;
+  border-radius:50%;
+  border:none;
+  cursor:pointer;
+  font-size:20px;
+  background:var(--accent);
+  color:white;
+}
+
+.mic-btn.listening{
+  background:#ef4444;
+}
+</style>
+</head>
+
+<body>
+
+<!-- ☰ -->
+<div class="menu-btn" onclick="togglePanel()">☰</div>
+
+<!-- 🌗 -->
+<button class="theme-btn" onclick="toggleTheme()">🌙 / ☀️</button>
+
+<!-- Side Menu -->
+<div class="side-panel" id="sidePanel">
+  <div class="menu-actions">
+    <button class="menu-btn-item" onclick="newChat()">➕ New Chat</button>
+  </div>
+
+  <h3>🔍 Search History</h3>
+  <div id="historyList"></div>
+</div>
+
+<!-- Main Content -->
+<div class="container">
+  <div class="box" id="planContent">
+    <h1>📘 AI Generated Teaching Plan</h1>
+
+    <h2>Topic Overview</h2>
+    <p>This lesson explains the topic using simple, real-life examples.</p>
+
+    <h2>⏱ Time Breakdown</h2>
+    <ul>
+      <li>Introduction – 5 mins</li>
+      <li>Concept Explanation – 15 mins</li>
+      <li>Activity – 10 mins</li>
+      <li>Recap & Questions – 10 mins</li>
+    </ul>
+
+    <h2>🎯 Classroom Activity</h2>
+    <p>Ask students to explain the concept in their own words.</p>
+  </div>
+</div>
+
+<!-- Bottom Search -->
+<div class="search-bottom">
+  <div class="search-box">
+    <input id="searchInput" placeholder="Search or speak..." onkeyup="handleSearch()">
+    <button class="mic-btn" id="micBtn" onclick="startVoiceSearch()">🎙</button>
+  </div>
+</div>
+
+<script>
+function toggleTheme(){
+  document.body.classList.toggle("dark");
+}
+
+function togglePanel(){
+  sidePanel.classList.toggle("open");
+}
+
+let searchHistory=[];
+const historyList=document.getElementById("historyList");
+
+function handleSearch(){
+  const text=searchInput.value.trim();
+  if(text){
+    saveHistory(text);
+    searchAndHighlight(text);
+  }
+}
+
+function saveHistory(text){
+  if(!searchHistory.includes(text)){
+    searchHistory.unshift(text);
+    updateHistory();
+  }
+}
+
+function updateHistory(){
+  historyList.innerHTML="";
+  searchHistory.forEach((item,i)=>{
+    const div=document.createElement("div");
+    div.className="history-item";
+
+    const span=document.createElement("span");
+    span.innerText=item;
+    span.onclick=()=>{
+      searchInput.value=item;
+      searchAndHighlight(item);
+      togglePanel();
+    };
+
+    const del=document.createElement("button");
+    del.className="delete-btn";
+    del.innerText="🗑️";
+    del.onclick=e=>{
+      e.stopPropagation();
+      searchHistory.splice(i,1);
+      updateHistory();
+    };
+
+    div.append(span,del);
+    historyList.appendChild(div);
+  });
+}
+
+function newChat(){
+  searchInput.value="";
+  document.querySelectorAll(".highlight")
+    .forEach(el=>el.classList.remove("highlight"));
+  togglePanel();
+}
+
+function searchAndHighlight(keyword){
+  const elements=document.querySelectorAll(
+    "#planContent h2,#planContent p,#planContent li"
+  );
+  elements.forEach(el=>el.classList.remove("highlight"));
+
+  for(let el of elements){
+    if(el.innerText.toLowerCase().includes(keyword.toLowerCase())){
+      el.classList.add("highlight");
+      el.scrollIntoView({behavior:"smooth",block:"center"});
+      break;
+    }
+  }
+}
+
+/* 🎙 Voice */
+const SpeechRecognition=window.SpeechRecognition||window.webkitSpeechRecognition;
+const recognition=SpeechRecognition?new SpeechRecognition():null;
+
+if(recognition){
+  recognition.lang="en-IN";
+  recognition.onstart=()=>micBtn.classList.add("listening");
+  recognition.onend=()=>micBtn.classList.remove("listening");
+  recognition.onresult=e=>{
+    const text=e.results[0][0].transcript;
+    searchInput.value=text;
+    saveHistory(text);
+    searchAndHighlight(text);
+  };
+}
+
+function startVoiceSearch(){
+  recognition ? recognition.start() : alert("Voice not supported");
+}
+</script>
+
+</body>
+</html>

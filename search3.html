@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Simple Explanation</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+/* ===== THEME ===== */
+:root{
+  --bg:#f4f6fb;
+  --card:#ffffff;
+  --text:#222;
+}
+
+body.dark{
+  --bg:#121212;
+  --card:#1e1e1e;
+  --text:#f1f1f1;
+}
+
+body{
+  margin:0;
+  font-family:Arial, sans-serif;
+  background:var(--bg);
+  color:var(--text);
+}
+
+/* ===== TOP BAR ===== */
+.topbar{
+  position:fixed;
+  top:0;
+  left:0;
+  right:0;
+  height:60px;
+  display:flex;
+  align-items:center;
+  padding:0 15px;
+  background:var(--bg);
+  box-shadow:0 2px 10px rgba(0,0,0,0.1);
+  z-index:1000;
+}
+
+.menu-btn{
+  font-size:22px;
+  cursor:pointer;
+}
+
+.title{
+  margin-left:15px;
+  font-size:20px;
+  font-weight:bold;
+}
+
+.mode-btn{
+  margin-left:auto;
+  border:none;
+  padding:6px 12px;
+  border-radius:20px;
+  cursor:pointer;
+  background:var(--card);
+}
+
+/* ===== SIDE MENU ===== */
+.side-menu{
+  position:fixed;
+  top:60px;
+  left:-280px;
+  width:260px;
+  height:100%;
+  background:var(--card);
+  box-shadow:4px 0 15px rgba(0,0,0,0.2);
+  padding:15px;
+  transition:0.3s;
+  z-index:999;
+}
+
+.side-menu.open{
+  left:0;
+}
+
+.new-chat{
+  width:100%;
+  padding:10px;
+  background:#6c63ff;
+  color:#fff;
+  border:none;
+  border-radius:8px;
+  cursor:pointer;
+  font-size:15px;
+}
+
+.history{
+  margin-top:20px;
+}
+
+.history h4{
+  margin-bottom:10px;
+}
+
+.chat-item{
+  background:var(--bg);
+  padding:8px;
+  border-radius:6px;
+  margin-bottom:8px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.chat-item span{
+  cursor:pointer;
+  font-size:14px;
+}
+
+.chat-item button{
+  border:none;
+  background:none;
+  cursor:pointer;
+}
+
+/* ===== CONTENT ===== */
+.content{
+  max-width:800px;
+  margin:90px auto 140px;
+  padding:20px;
+}
+
+.card{
+  background:var(--card);
+  padding:25px;
+  border-radius:12px;
+  box-shadow:0 5px 20px rgba(0,0,0,0.1);
+}
+
+/* ===== SEARCH BAR ===== */
+.search{
+  position:fixed;
+  bottom:25px;
+  left:50%;
+  transform:translateX(-50%);
+  display:flex;
+  background:var(--card);
+  padding:10px 14px;
+  border-radius:40px;
+  box-shadow:0 10px 30px rgba(0,0,0,0.2);
+}
+
+.search input{
+  border:none;
+  outline:none;
+  width:220px;
+  background:transparent;
+  color:var(--text);
+}
+
+.btn{
+  margin-left:10px;
+  width:38px;
+  height:38px;
+  border-radius:50%;
+  border:none;
+  background:#6c63ff;
+  color:#fff;
+  cursor:pointer;
+}
+</style>
+</head>
+
+<body>
+
+<!-- ===== TOP BAR ===== -->
+<div class="topbar">
+  <div class="menu-btn" onclick="toggleMenu()">☰</div>
+  <div class="title">Simple Explanation</div>
+  <button class="mode-btn" onclick="toggleMode()">🌙 / ☀️</button>
+</div>
+
+<!-- ===== SIDE MENU ===== -->
+<div class="side-menu" id="sideMenu">
+  <button class="new-chat" onclick="newChat()">➕ New Chat</button>
+
+  <div class="history">
+    <h4>Chat History</h4>
+    <div id="historyList"></div>
+  </div>
+</div>
+
+<!-- ===== CONTENT ===== -->
+<div class="content">
+  <div class="card">
+    <h2 id="topic">Search a topic to start</h2>
+    <p>
+      This page explains topics in very simple language so teachers
+      can explain clearly in class.
+    </p>
+  </div>
+</div>
+
+<!-- ===== SEARCH BAR ===== -->
+<div class="search">
+  <input id="searchInput" placeholder="Search topic..." />
+  <button class="btn" onclick="startVoice()">🎤</button>
+  <button class="btn" onclick="doSearch()">🔍</button>
+</div>
+
+<script>
+/* ===== VARIABLES ===== */
+const sideMenu = document.getElementById("sideMenu");
+const topicEl = document.getElementById("topic");
+const historyList = document.getElementById("historyList");
+const searchInput = document.getElementById("searchInput");
+
+let chats = JSON.parse(localStorage.getItem("chats")) || [];
+
+/* ===== MENU ===== */
+function toggleMenu(){
+  sideMenu.classList.toggle("open");
+}
+
+/* ===== DARK / LIGHT ===== */
+function toggleMode(){
+  document.body.classList.toggle("dark");
+}
+
+/* ===== NEW CHAT ===== */
+function newChat(){
+  topicEl.innerText = "New Chat";
+  searchInput.value = "";
+}
+
+/* ===== SEARCH ===== */
+function doSearch(){
+  const value = searchInput.value.trim();
+  if(!value) return;
+
+  topicEl.innerText = value;
+  saveChat(value);
+}
+
+/* ===== SAVE CHAT ===== */
+function saveChat(text){
+  if(!chats.includes(text)){
+    chats.unshift(text);
+    localStorage.setItem("chats", JSON.stringify(chats));
+    renderHistory();
+  }
+}
+
+/* ===== HISTORY ===== */
+function renderHistory(){
+  historyList.innerHTML = "";
+  chats.forEach((chat, index)=>{
+    const item = document.createElement("div");
+    item.className = "chat-item";
+
+    const title = document.createElement("span");
+    title.innerText = chat;
+    title.onclick = ()=> topicEl.innerText = chat;
+
+    const del = document.createElement("button");
+    del.innerText = "🗑️";
+    del.onclick = ()=>{
+      chats.splice(index,1);
+      localStorage.setItem("chats", JSON.stringify(chats));
+      renderHistory();
+    };
+
+    item.appendChild(title);
+    item.appendChild(del);
+    historyList.appendChild(item);
+  });
+}
+
+/* ===== ENTER KEY SUPPORT ===== */
+searchInput.addEventListener("keydown", e=>{
+  if(e.key === "Enter") doSearch();
+});
+
+/* ===== 🎤 VOICE INPUT ===== */
+function startVoice(){
+  if(!('webkitSpeechRecognition' in window)){
+    alert("Voice input not supported in this browser");
+    return;
+  }
+
+  const recognition = new webkitSpeechRecognition();
+  recognition.lang = "en-IN";
+  recognition.start();
+
+  recognition.onresult = e=>{
+    const text = e.results[0][0].transcript;
+    searchInput.value = text;
+    doSearch(); // auto search after voice
+  };
+}
+
+/* ===== INIT ===== */
+renderHistory();
+</script>
+
+</body>
+</html>

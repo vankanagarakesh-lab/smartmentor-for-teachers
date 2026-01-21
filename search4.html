@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Level Wise Tasks</title>
+
+<style>
+:root {
+    --bg: #f4f6fa;
+    --card: #ffffff;
+    --text: #222;
+    --accent: #6c63ff;
+}
+
+body.dark {
+    --bg: #121212;
+    --card: #1e1e1e;
+    --text: #f5f5f5;
+}
+
+body {
+    margin: 0;
+    font-family: "Segoe UI", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    transition: 0.3s;
+}
+
+/* Header */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 24px;
+}
+
+.toggle {
+    background: var(--accent);
+    color: #fff;
+    padding: 6px 14px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+/* Container */
+.container {
+    max-width: 900px;
+    margin: auto;
+    padding: 20px;
+}
+
+/* Level Card */
+.level-card {
+    background: var(--card);
+    border-radius: 14px;
+    margin-bottom: 18px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+    overflow: hidden;
+}
+
+.level-header {
+    padding: 16px;
+    font-size: 18px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(108,99,255,0.1);
+}
+
+/* Progress Bar */
+.progress-box {
+    padding: 0 16px 14px;
+}
+
+.progress {
+    width: 100%;
+    height: 8px;
+    background: #ddd;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    width: 0%;
+    background: var(--accent);
+    transition: width 0.3s;
+}
+
+.progress-text {
+    font-size: 12px;
+    margin-top: 6px;
+}
+
+/* Tasks */
+.tasks {
+    display: none;
+    padding: 10px 20px 16px;
+}
+
+.task {
+    display: flex;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+}
+
+.task:last-child {
+    border-bottom: none;
+}
+
+.task input {
+    margin-right: 10px;
+    transform: scale(1.2);
+}
+
+.task.completed {
+    text-decoration: line-through;
+    opacity: 0.6;
+}
+
+/* Responsive */
+@media(max-width:600px){
+    .level-header { font-size: 16px; }
+}
+</style>
+</head>
+
+<body>
+
+<!-- Header -->
+<div class="header">
+    <h2>📘 Level Wise Tasks</h2>
+    <div class="toggle" onclick="toggleMode()">Dark / Light</div>
+</div>
+
+<div class="container">
+
+<!-- LEVEL 1 -->
+<div class="level-card">
+    <div class="level-header" onclick="toggleTasks(this)">
+        Level 1 – Beginner <span>+</span>
+    </div>
+
+    <div class="progress-box">
+        <div class="progress">
+            <div class="progress-fill"></div>
+        </div>
+        <div class="progress-text">0% Completed</div>
+    </div>
+
+    <div class="tasks">
+        <div class="task">
+            <input type="checkbox" onchange="updateProgress(this)">
+            Understand topic basics
+        </div>
+        <div class="task">
+            <input type="checkbox" onchange="updateProgress(this)">
+            Prepare simple lesson plan
+        </div>
+        <div class="task">
+            <input type="checkbox" onchange="updateProgress(this)">
+            Create 5 MCQs
+        </div>
+    </div>
+</div>
+
+<!-- LEVEL 2 -->
+<div class="level-card">
+    <div class="level-header" onclick="toggleTasks(this)">
+        Level 2 – Intermediate <span>+</span>
+    </div>
+
+    <div class="progress-box">
+        <div class="progress">
+            <div class="progress-fill"></div>
+        </div>
+        <div class="progress-text">0% Completed</div>
+    </div>
+
+    <div class="tasks">
+        <div class="task">
+            <input type="checkbox" onchange="updateProgress(this)">
+            Design interactive activity
+        </div>
+        <div class="task">
+            <input type="checkbox" onchange="updateProgress(this)">
+            Real-world examples
+        </div>
+        <div class="task">
+            <input type="checkbox" onchange="updateProgress(this)">
+            Student engagement plan
+        </div>
+    </div>
+</div>
+
+<!-- LEVEL 3 -->
+<div class="level-card">
+    <div class="level-header" onclick="toggleTasks(this)">
+        Level 3 – Advanced <span>+</span>
+    </div>
+
+    <div class="progress-box">
+        <div class="progress">
+            <div class="progress-fill"></div>
+        </div>
+        <div class="progress-text">0% Completed</div>
+    </div>
+
+    <div class="tasks">
+        <div class="task">
+            <input type="checkbox" onchange="updateProgress(this)">
+            AI-assisted assessment
+        </div>
+        <div class="task">
+            <input type="checkbox" onchange="updateProgress(this)">
+            Performance analysis
+        </div>
+        <div class="task">
+            <input type="checkbox" onchange="updateProgress(this)">
+            Feedback & improvement report
+        </div>
+    </div>
+</div>
+
+</div>
+
+<script>
+function toggleTasks(header) {
+    const tasks = header.nextElementSibling.nextElementSibling;
+    const icon = header.querySelector("span");
+    tasks.style.display = tasks.style.display === "block" ? "none" : "block";
+    icon.textContent = tasks.style.display === "block" ? "−" : "+";
+}
+
+function updateProgress(checkbox) {
+    const levelCard = checkbox.closest(".level-card");
+    const tasks = levelCard.querySelectorAll(".task input");
+    const completed = levelCard.querySelectorAll(".task input:checked").length;
+    const percent = Math.round((completed / tasks.length) * 100);
+
+    levelCard.querySelector(".progress-fill").style.width = percent + "%";
+    levelCard.querySelector(".progress-text").textContent = percent + "% Completed";
+
+    checkbox.parentElement.classList.toggle("completed", checkbox.checked);
+}
+
+function toggleMode() {
+    document.body.classList.toggle("dark");
+}
+</script>
+
+</body>
+</html>
